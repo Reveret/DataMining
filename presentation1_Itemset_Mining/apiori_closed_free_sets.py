@@ -4,41 +4,32 @@ from matplotlib import pyplot as plt
 import csv
 
 
-# Input: file, threshold, dictionary mit den Häuigkeiten der einzelnen Tupel
-# Return: Alle einelementige Tupel, eingelesene File(Zeilen binäre codiert), Neg-Border
-# Lese daten ein, formatiere die Zeilen binäre und berechne alle einelementigen Tupel
 def read(file, threshold, frequency):
     file = open(file, "r")
-    data = []       # Zeilen der file binäre codiert
-    count = None    # Häufigkeit der einelementigen Tupel
+    data = []
+    count = None
     for line in file:
         tmp = [int(x) for x in line.strip().split(",")]
-        if not count:   # Wenn count noch nicht initialisiert wurde, initialisiere count
-            count = [0 for i in range(len(tmp))]
-
         number = 0
-        for i in range(len(tmp)):   # umcodierung und zählen der einelementigen Tupel
+        if not count:
+            count = [0 for i in range(len(tmp))]
+        for i in range(len(tmp)):
             if tmp[i] == 1:
                 count[i] += 1
                 number += 2 ** i
-        data.append(number)         # binär codierte Zeile in data
-
+        data.append(number)
     file.close()
-    first = []      # Alle einelementige Tupel, die häufig sind
-    neg = []        # Alle Tupel, die nicht häufig sind
+    first = []
+    neg = []
     for i in range(len(count)):
         if count[i] / len(data) >= threshold:
             first.append(2 ** i)
-            frequency[2 ** i] = count[i]    # Wie häufig ist dieses Tupel
+            frequency[2 ** i] = count[i]
         else:
             neg.append(2 ** i)
-
     return first, data, neg
 
 
-# Input: Tupel, threshold
-# Return: Häufigkeit des Tupels, ist Häufig?
-# Gehe über alle Zeilen und zähle die Häufigkeit
 def check_freq(x, threshold):
     global data
     count = 0
@@ -49,34 +40,34 @@ def check_freq(x, threshold):
     return count, count >= min
 
 
-# Input: Die Vorherigen Freq-Tupel, alle einelementigen Tupel, Iterationsschritt/Tupelgröße, threshold, dictionary mit den Häuigkeiten der einzelnen Tupel
-# Output: die nächsten Freq-Tupel, neg-Border, pos-Border, free-Sets, subsets der sets
 # Calculate Freq-tupel with size k
 def cacl_freq(prev_freq, ones, k, threshold, frequency):
-    pos = dict()        # subset des sets
-    # Füge zu jedem prev-freq einzelnd die freq-ones hinzu und speicher für dieses neue Tupel das prev-tupel
+    # new = dict()    # Anzhal der Subset, die zum set werden
+    pos = dict()  # subset des sets
     for prev in prev_freq:
         for o in ones:
             new_or = prev | o
             if new_or != prev:
                 if new_or not in pos.keys():
+                    # new[new_or] = 1
                     pos[new_or] = [prev]
                 else:
+                    # new[new_or] += 1
                     pos[new_or].append(prev)
 
-    next_freq = []      # Alle next-freq-Tupel, die auch häufig sind
-    neg = []            # Alle neg-Border-Tupel
+    next_freq = []
+    neg = []
     result_pos = set()  # Subsets vom set, welches auch freq ist
-    free = []           # alle Free-Set-Tupel
-    for n in pos.keys():        # Iteriere über alle neu entstandenen Tupel
-        if len(pos[n]) == k:    # Wenn neues Tupel oft genug erzeugt wurde, nämlcih k mal
-            number, is_freq = check_freq(n, threshold)  #prüfe ob dieses Tupel wirklich häufig ist
+    free = []
+    for n in pos.keys():
+        if len(pos[n]) == k:
+            number, is_freq = check_freq(n, threshold)
             frequency[n] = number
-            if is_freq:         # Wenn Tupel häufig ist, füge es dem ergebnis hinzu
+            if is_freq:
                 next_freq.append(n)
                 result_pos |= set(pos[n])
-                for subsets in pos[n]:      # Schaue für das Tupel, ob es ein free-set ist
-                    if number >= frequency[subsets]:    # Alle Subsets müssen häufiger sein
+                for subsets in pos[n]:
+                    if number >= frequency[subsets]:
                         break
                 else:
                     free.append(n)
@@ -85,9 +76,6 @@ def cacl_freq(prev_freq, ones, k, threshold, frequency):
     return next_freq, neg, result_pos, free, pos
 
 
-# Input: Lists einer Liste von binär codierten Tupeln
-# Output: Liste eienr Liste der Tupel
-# Codiere die binäre dargestellten Tupel wieder um
 def number_to_tupel(result):
     freq_tupel = []
     for x in result:
@@ -107,8 +95,6 @@ def number_to_tupel(result):
     return freq_tupel
 
 
-# Input: Threshold, File
-# Output:
 # calculate all freq-tupel with threshold and from file
 def get_all_freq(threshold, file):
     global data
@@ -123,7 +109,6 @@ def get_all_freq(threshold, file):
 
     free_set = [freq_ones.copy()]
     closed_set = freq_ones.copy()
-
 
     k = 2
     while len(prev_freq) != 0:
