@@ -4,12 +4,26 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 import matplotlib.pylab as plb
+import matplotlib.colors as plc
 import sklearn.metrics as skm
 from purity import purity_score
+
 
 # Calculate distance between two points in n-dimensions
 def distance(a, b):
     return math.sqrt(sum([(d_a - d_b) ** 2 for d_a, d_b in zip(a, b)]))
+
+
+def calc_centers(centers, clusters, dimensions, data):
+    for num, cluster in enumerate(clusters):
+        # If cluster is empty set random center
+        if len(cluster) == 0:
+            centers[num] = [random.random() * (data.max() - data.min()) + data.min() for _ in range(dimensions)]
+            continue
+
+        # Calculate mean of all dimensions and create center
+        for dim in range(dimensions):
+            centers[num][dim] = np.array([data[p][dim] for p in cluster]).mean()
 
 
 # K-Means calculation
@@ -44,22 +58,14 @@ def kmeans(k, data):
             clusters[dists.index(min_dist)].append(index)
 
         # Calculate new centers for every cluster
-        for num, cluster in enumerate(clusters):
-            # If cluster is empty set random center
-            if len(cluster) == 0:
-                centers[num] = [random.random() * (data.max() - data.min()) + data.min() for _ in range(dimensions)]
-                continue
-
-            # Calculate mean of all dimensions and create center
-            for dim in range(dimensions):
-                centers[num][dim] = np.array([data[p][dim] for p in cluster]).mean()
+        calc_centers(centers, clusters, dimensions, data)
 
     return centers, clusters
 
 
 # Lese File ein
 def read_dataset(path):
-    file = open(path, "r")
+    file = open("datasets/" + path, "r")
     data = []
     labels = []
 
@@ -81,23 +87,30 @@ def read_dataset(path):
 def plot_cluster(data, clusters, centers):
     for num, cluster in enumerate(clusters):
         # Colors
-        r, g, b = random.random(), random.random(), random.random()
-        r = min(r+g+b, 0.3)
+        hsv = (((300 / len(clusters)) * num + 60) / 360, 0.7, 1)
         # Plot clusters
         d = np.array([data[i] for i in cluster])
-        plt.plot(d[:, 0], d[:, 1], color=(r, g, b), marker='o', ls="")
+        plt.plot(d[:, 0], d[:, 1], color=plc.hsv_to_rgb(hsv), marker='o', ls="")
         # Plot centers
         plt.plot(centers[num][0], centers[num][1], 'rD')
 
     plt.show()
 
 
-def labels_for_clusters(size_data, clusters):
-    labels = [None for _ in range(size_data)]
+def labels_for_clusters(clusters):
+    labels = [None for _ in range(sum(len(l) for l in clusters))]
     for num, cluster in enumerate(clusters):
         for point in cluster:
             labels[point] = num
     return labels
+
+
+def labels_to_clusters(labels):
+    clusters = [[] for _ in range(max(labels) + 1)]
+    for i, lab in enumerate(labels):
+        clusters[lab].append(i)
+
+    return clusters
 
 
 def clustering(path=None, k=None):
@@ -114,10 +127,15 @@ def clustering(path=None, k=None):
     # Plot clusters
     plot_cluster(data, clusters, centers)
 
+    return centers, clusters, data
 
-def analyse(method, path, borders, repeats=30):
+
+def analyse(method, path, borders, repeats=30, target_labels=None):
     # Read in data and labels
-    data, target_labels = read_dataset(path)
+    if target_labels is not None:
+        data, _ = read_dataset(path)
+    else:
+        data, target_labels = read_dataset(path)
     scores = []
     all_labels = []
     # Calculate different k's
@@ -130,7 +148,7 @@ def analyse(method, path, borders, repeats=30):
             # Calculate clusters
             _, clusters = kmeans(k, data)
             # Get labels
-            labels = labels_for_clusters(len(data), clusters)
+            labels = labels_for_clusters(clusters)
             n_score = method(target_labels, labels)
             if best_score < n_score:
                 best_score = n_score
@@ -160,12 +178,36 @@ def analyse(method, path, borders, repeats=30):
 
 
 def analysing_datasets():
-    for file in ["jain.txt", "Compound.txt"]:
-        for method in [skm.adjusted_rand_score, skm.adjusted_mutual_info_score, purity_score]:
+    files = []  # ["jain.txt", "Compound.txt"]
+    methods = [skm.adjusted_rand_score, skm.adjusted_mutual_info_score, purity_score]
+
+    for file in files:
+        for method in methods:
             print(method.__name__ + " with " + file)
             scores = analyse(method, file, (1, 10))
 
-if __name__ == "__main__":
-    # clustering("Compound.txt", 9)
-    analysing_datasets()
+    for method in methods:
+        print(method.__name__ + " with " + "s2.txt")
+        labels = []
+        with open("s2_target_labels.txt", "r") as f:
+            for line in f:
+                labels.append(line)
+        score = analyse(method, "s2.txt", (1, 10), target_labels=labels)
 
+
+if __name__ == "__main__":
+    """_, clusts, _ = clustering("s2.txt", 15)
+    labels = labels_for_clusters(clusts)
+    with open("datasets/s2_target_labels.txt", "w") as f:
+        for l in labels:
+            f.write(str(l) + "\n")
+    """
+    labels = []
+    with open("datasets/s2_target_labels.txt", "r") as f:
+        for line in f:
+            labels.append(int(line))
+    clust = labels_to_clusters(labels)
+    cents = [[0, 0] for _ in range(max(labels) + 1)]
+    calc_centers(cents, clust, 2, read_dataset("s2.txt"))
+
+    # analysing_datasets()
