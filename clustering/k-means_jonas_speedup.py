@@ -2,6 +2,7 @@ import math
 import random
 import numpy as np
 import sys
+import time
 import matplotlib.pyplot as plt
 import matplotlib.pylab as plb
 import matplotlib.colors as plc
@@ -154,41 +155,48 @@ def analyse(methods, path, borders, repeats=30, target_labels=None):
     else:
         data, target_labels = read_dataset(path)
 
-    # Use every method for evaluation
-    for i, method in enumerate(methods):
-        print("- " + method.__name__)
-        scores = []
-        all_labels = []
-        # Calculate different k's
-        for k in range(borders[0], borders[1]):
+    eval_scores = [[] for _ in methods]
+    eval_labels = [[] for _ in methods]
+    # For every 'k' in border
+    for k in range(borders[0], borders[1]):
+        print("k: " + str(k))
 
-            best_score = -math.inf
-            best_labels = []
-            # Calculate more often to avoid local peaks
-            for _ in range(repeats):
-                # Calculate clusters
-                _, clusters = kmeans(k, data)
-                # Get labels
-                labels = clusters_to_labels(clusters)
+        # Best score and labels
+        best_scores = [-math.inf for _ in methods]
+        best_labels = [[] for _ in methods]
+
+        # Calculate more often to avoid local peaks
+        for rep in range(repeats):
+            t = time.time()
+            # Calculate clusters
+            _, clusters = kmeans(k, data)
+            # Get labels
+            labels = clusters_to_labels(clusters)
+            print("-{}: clustering complete after: {}".format(rep, time.time() - t))
+
+            # Evaluate clustering with different methods
+            for i, method in enumerate(methods):
 
                 # Take best score and the labels for this
                 n_score = method(target_labels, labels)
-                if best_score < n_score:
-                    best_score = n_score
-                    best_labels = labels
+                if best_scores[i] < n_score:
+                    best_scores[i] = n_score
+                    best_labels[i] = labels
 
-            # Save best scores and labels for this method after several repeats
-            scores.append(best_score)
-            all_labels.append(best_labels)
+        for i in range(len(eval_scores)):
+            eval_scores[i].append(best_scores[i])
+            eval_labels[i].append(best_labels[i])
 
+    for i, method in enumerate(methods):
         # Plot the scores
         color = [1 if i == j else 0 for j in range(3)]
-        plt.plot(range(1, 10), scores, marker="o", ls="--", color=color, label=method.__name__)
-        plt.plot(scores.index(max(scores)) + 1, max(scores), marker="*", markersize=13, color=color)
+        plt.plot(range(borders[0], borders[1]), eval_scores[i], marker="o", ls="--", color=color, label=method.__name__)
+        plt.plot(eval_scores[i].index(max(eval_scores[i])) + 1, max(eval_scores[i]), marker="*", markersize=13,
+                 color=color)
 
-        # Save best label in file
+        # Save best labels in file
         with open("analyse/labels/{}_labels.txt".format("{} - {}".format(path, method.__name__)), "w") as f:
-            d = all_labels[scores.index(max(scores))]
+            d = eval_labels[eval_scores.index(max(eval_scores))]
             for l in d:
                 f.write(str(l) + "\n")
 
