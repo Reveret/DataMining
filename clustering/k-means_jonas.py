@@ -2,6 +2,7 @@ import math
 import random
 import numpy as np
 import sys
+import time
 import matplotlib.pyplot as plt
 import matplotlib.pylab as plb
 import matplotlib.colors as plc
@@ -11,9 +12,28 @@ from purity import purity_score
 SHOW_STEPS = False
 
 
-# Calculate distance between two points in n-dimensions
-def distance(a, b):
-    return math.sqrt(sum([(d_a - d_b) ** 2 for d_a, d_b in zip(a, b)]))
+# Read in file
+def read_dataset(path):
+    file = open("datasets/" + path, "r")
+    data = []
+    labels = []
+
+    for line in file:
+        # Prepare line
+        num_line = list(map(float, [num for num in line.strip().split() if num not in ("", "\t")]))
+
+        # Split into data point and label
+        point = []
+        label = []
+        for i, num in enumerate(num_line):
+            point.append(num) if i < 2 else label.append(num)
+
+        data.append(point)
+        if len(label) > 0:
+            labels.append(label[-1])
+
+    print("Completed read in: {}".format(path))
+    return np.array(data), labels if len(labels) > 0 else None
 
 
 # Calculate new centers for the clusters
@@ -21,7 +41,8 @@ def calc_centers(centers, clusters, dimensions, data):
     for num, cluster in enumerate(clusters):
         # If cluster is empty set random center
         if len(cluster) == 0:
-            centers[num] = [random.random() * (data.max() - data.min()) + data.min() for _ in range(dimensions)]
+            centers[num] = [random.random() * (data[:, i].max() - data[:, i].min()) + data[:, 1].min() for i in
+                            range(dimensions)]
             continue
 
         # Calculate mean of all dimensions and create center
@@ -31,6 +52,10 @@ def calc_centers(centers, clusters, dimensions, data):
 
 # K-Means calculation
 def kmeans(k, data):
+    # Calculate distance between two points in n-dimensions - function method
+    def distance(a, b):
+        return math.sqrt(sum([(d_a - d_b) ** 2 for d_a, d_b in zip(a, b)]))
+
     # Get dimensions of data
     dimensions = len(data[0])
 
@@ -70,32 +95,9 @@ def kmeans(k, data):
     return centers, clusters
 
 
-# Read in file
-def read_dataset(path):
-    file = open("datasets/" + path, "r")
-    data = []
-    labels = []
-
-    for line in file:
-        # Prepare line
-        num_line = list(map(float, [num for num in line.strip().split() if num not in ("", "\t")]))
-
-        # Split into data point and label
-        point = []
-        label = []
-        for i, num in enumerate(num_line):
-            point.append(num) if i < 2 else label.append(num)
-
-        data.append(point)
-        if len(label) > 0:
-            labels.append(label[-1])
-
-    print("Completed read in: {}".format(path))
-    return np.array(data), labels if len(labels) > 0 else None
-
-
 # Plotting for clusters
 def plot_cluster(data, clusters, centers):
+    # Plot cluster points
     for num, cluster in enumerate(clusters):
         # Colors
         hsv = (((300 / len(clusters)) * num + 60) / 360, 0.7, 1)
@@ -103,10 +105,28 @@ def plot_cluster(data, clusters, centers):
         if len(cluster) != 0:
             d = np.array([data[i] for i in cluster])
             plt.plot(d[:, 0], d[:, 1], color=plc.hsv_to_rgb(hsv), marker='o', ls="")
-        # Plot centers
-        plt.plot(centers[num][0], centers[num][1], 'rD')
+
+    # Plot centers
+    for num, cluster in enumerate(clusters):
+        if len(cluster) != 0:
+            plt.plot(centers[num][0], centers[num][1], color=(1, 0, 0), marker='D')
+        else:
+            plt.plot(centers[num][0], centers[num][1], color=(0, 0, 0), marker='X')
 
     plt.show()
+
+
+# Plot clusters from given labels
+def plot_from_label(label_file, data_file):
+    labels = []
+    with open(label_file, "r") as f:
+        for line in f:
+            labels.append(int(line))
+    clust = labels_to_clusters(labels)
+    cents = [[0, 0] for _ in range(max(labels) + 1)]
+    data, _ = read_dataset(data_file)
+    calc_centers(cents, clust, len(data[0]), data)
+    plot_cluster(data, clust, cents)
 
 
 # Create 1D list with a label for every data point with is corresponding to its cluster
@@ -154,87 +174,98 @@ def analyse(methods, path, borders, repeats=30, target_labels=None):
     else:
         data, target_labels = read_dataset(path)
 
-    # Use every method for evaluation
-    for i, method in enumerate(methods):
-        print("- " + method.__name__)
-        scores = []
-        all_labels = []
-        # Calculate different k's
-        for k in range(borders[0], borders[1]):
+    eval_scores = [[] for _ in methods]
+    eval_labels = [[] for _ in methods]
+    # For every 'k' in border
+    for k in range(borders[0], borders[1]):
+        print("k: {} --> {}".format(k, path))
 
-            best_score = -math.inf
-            best_labels = []
-            # Calculate more often to avoid local peaks
-            for _ in range(repeats):
-                # Calculate clusters
-                _, clusters = kmeans(k, data)
-                # Get labels
-                labels = clusters_to_labels(clusters)
+        # Best score and labels
+        best_scores = [-math.inf for _ in methods]
+        best_labels = [[] for _ in methods]
+
+        # Calculate more often to avoid local peaks
+        for rep in range(repeats):
+            t = time.time()
+            # Calculate clusters
+            _, clusters = kmeans(k, data)
+            # Get labels
+            labels = clusters_to_labels(clusters)
+            print("-{}: clustering complete after: {}".format(rep, time.time() - t))
+
+            # Evaluate clustering with different methods
+            for i, method in enumerate(methods):
 
                 # Take best score and the labels for this
                 n_score = method(target_labels, labels)
-                if best_score < n_score:
-                    best_score = n_score
-                    best_labels = labels
+                if best_scores[i] < n_score:
+                    best_scores[i] = n_score
+                    best_labels[i] = labels
 
-            # Save best scores and labels for this method after several repeats
-            scores.append(best_score)
-            all_labels.append(best_labels)
+        for i in range(len(eval_scores)):
+            eval_scores[i].append(best_scores[i])
+            eval_labels[i].append(best_labels[i])
 
+    for i, method in enumerate(methods):
         # Plot the scores
         color = [1 if i == j else 0 for j in range(3)]
-        plt.plot(range(1, 10), scores, marker="o", ls="--", color=color, label=method.__name__)
-        plt.plot(scores.index(max(scores)) + 1, max(scores), marker="*", markersize=13, color=color)
+        plt.plot(range(borders[0], borders[1]), eval_scores[i], marker="o", ls="--", color=color, label=method.__name__)
 
-        # Save best label in file
+        # Save best labels in file
         with open("analyse/labels/{}_labels.txt".format("{} - {}".format(path, method.__name__)), "w") as f:
-            d = all_labels[scores.index(max(scores))]
+            d = eval_labels[i][eval_scores[i].index(max(eval_scores[i]))]
             for l in d:
                 f.write(str(l) + "\n")
+
+    for i in range(len(methods)):
+        color = [1 if i == j else 0 for j in range(3)]
+        plt.plot(eval_scores[i].index(max(eval_scores[i])) + 1, max(eval_scores[i]), marker="*", markersize=13,
+                 color=color)
 
     # Plot all scores in one diagram for best comparison and save to file
     plt.ylabel("score")
     plt.xlabel("k")
+    plt.xticks(np.arange(int(plt.xlim()[0]), round(plt.xlim()[1]), 1.0))
     plt.legend(bbox_to_anchor=(-0.15, 1.1), loc=2, ncol=3)
     plt.title("{} - all scores".format(path), y=1.08)
     plb.savefig("analyse/plots/{}.png".format("{} - all scores".format(path)))
-    plt.show()
+    # plt.show()
+
+    plt.close()
 
 
+# Analyses different datasets with the 'analyse' method from above
 def analysing_datasets():
-    files = []  # ["jain.txt", "Compound.txt"]
+    files = ["jain.txt", "Compound.txt"]
     methods = [skm.adjusted_rand_score, skm.adjusted_mutual_info_score, purity_score]
 
     for file in files:
-        analyse(methods, file, (1, 10), 1)
+        analyse(methods, file, (1, 20), 30)
 
-    # analyse(methods, "s2.txt", (1, 10), target_labels=)
     with open("datasets/s2_target_labels.txt", "r") as f:
         labels = [int(line.strip()) for line in f]
-    analyse(methods, "s2.txt", (1, 10), target_labels=labels)
+    analyse(methods, "s2.txt", (1, 20), repeats=20, target_labels=labels)
 
 
-def plot_from_label(label_file, data_file):
-    labels = []
-    with open(label_file, "r") as f:
-        for line in f:
-            labels.append(int(line))
-    clust = labels_to_clusters(labels)
-    cents = [[0, 0] for _ in range(max(labels) + 1)]
-    data, _ = read_dataset(data_file)
-    calc_centers(cents, clust, len(data[0]), data)
-    plot_cluster(data, clust, cents)
+# For us to find good labels with optically fit the best for this dataset
+# Save this labels for our "target labels" for dataset s2
+# !! Overwrites data !!
+def find_best_for_s2():
+    _, clusters = clustering("s2.txt", 15)
+    labels = clusters_to_labels(clusters)
+    with open("datasets/s2_target_labels_2.txt", "w") as f:
+        for l in labels:
+            f.write(str(l) + "\n")
 
 
 if __name__ == "__main__":
-    """_, clusts, _ = clustering("s2.txt", 15)
-    labels = labels_for_clusters(clusts)
-    with open("datasets/s2_target_labels.txt", "w") as f:
-        for l in labels:
-            f.write(str(l) + "\n")
-    """
-    # plot_from_label("analyse/labels/Compound.txt - purity_score_labels.txt", "Compound.txt")
+    # Plot a dataset from some specified labels
+    dataset = "Compound.txt"
+    method = "purity_score"
+    plot_from_label("analyse/labels/{} - {}_labels.txt".format(dataset, method), dataset)
 
-    analysing_datasets()
+    # Analysing all datasets
+    # analysing_datasets()
 
+    # Cluster a dataset with fixed k
     # clustering("Compound.txt", 8)
