@@ -46,7 +46,7 @@ weights = None  # matrix of probabilities for every point and every cluster
 lhs = []
 
 num_clusters = 2  # Number of clusters
-max_iters = 100  # Max number of iterations
+max_iters = 20  # Max number of iterations
 iters = 0
 
 data = read_data("EM-data.csv")  # Read in data
@@ -71,6 +71,8 @@ while old_likelihood != likelihood(data, my, sigma, probs, num_clusters) and ite
     # To File
     out_file.write(output)
     out_file.write("\n")
+
+out_file.close()
 
 
 def plot(x, u, o, n_clusters, it, hoods):

@@ -268,8 +268,10 @@ if __name__ == "__main__":
     # method = "purity_score"
     # plot_from_label("analyse/labels/{} - {}_labels.txt".format(dataset, method), dataset)
 
+    plot_from_label("datasets/s2_target_labels.txt", "s2.txt")
+
     # Analysing all datasets
     # analysing_datasets()
 
     # Cluster a dataset with fixed k
-    clustering()
+    # clustering("s2.txt", 15)
