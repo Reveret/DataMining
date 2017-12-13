@@ -265,8 +265,10 @@ def find_best_for_s2():
 if __name__ == "__main__":
     # Plot a dataset from some specified labels
     # dataset = "Compound.txt"
-    # method = "purity_score"
+    # method = "adjusted_mutual_info_score"
     # plot_from_label("analyse/labels/{} - {}_labels.txt".format(dataset, method), dataset)
+
+    # plot_from_label("datasets/s2_target_labels.txt", "s2.txt")
 
     # Analysing all datasets
     # analysing_datasets()
