@@ -1,6 +1,5 @@
 import math
 import matplotlib.pyplot as plt
-import numpy as np
 
 
 def likelihood(x, u, o, p, n_clusters):
