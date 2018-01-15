@@ -3,6 +3,9 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import random
+import numpy as np
+
+import sklearn.metrics as met
 
 G = None  # Original graph
 
@@ -131,6 +134,7 @@ def dcut(tree):
 
 
 def cut_until(k, tree):
+    """ Cut the graph until k-clusters are created """
     tree_collection = [tree]
     cutted = []
     while len(tree_collection) < k:
@@ -165,8 +169,8 @@ def dct():
     while len(T) < len(G.nodes()):
         maxv, p, q = -1, None, None
         for u in T:
-            if len(T) == 2224:
-                pass
+            if len(T) == 2220:
+                print("Hi")
             for v in get_neighbours(u):
                 if v not in checked and s(u, v) > maxv:
                     maxv = s(u, v)
@@ -292,6 +296,23 @@ def generate_labels(cluster):
     return labels
 
 
+def purity_score(true_labels, labels):
+    """
+    Calculate the purity score for the given cluster assignments and ground truth classes
+    """
+
+    A = np.c_[(labels, true_labels)]
+
+    n_accurate = 0.
+
+    for j in np.unique(A[:, 0]):
+        z = A[A[:, 0] == j, 1]
+        x = np.argmax(np.bincount(z))
+        n_accurate += len(z[z == x])
+
+    return n_accurate / A.shape[0]
+
+
 def karate():
     """ karate data set """
     global G
@@ -347,11 +368,13 @@ def yeast():
     correct_labels = read_labels(label_path)
     my_labels = generate_labels(cluster)
 
-    """
-    Normalized mutal information
-    adjusted rand index
-    cluster purity
-    """
+    pur = purity_score(correct_labels, my_labels)
+    mutal = met.adjusted_mutual_info_score(correct_labels, my_labels)
+    rand = met.adjusted_rand_score(correct_labels, my_labels)
+
+    print("Purity:", pur)
+    print("Mutal info:", mutal)
+    print("Rand:", rand)
 
 
 def main():
