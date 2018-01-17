@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import random
 import numpy as np
+from saver import save_data, load_data
 
 import sklearn.metrics as met
 
@@ -169,32 +170,26 @@ def dct():
     while len(T) < len(G.nodes()):
         maxv, p, q = -1, None, None
         for u in T:
-            if len(T) == 2220:
-                print("Hi")
             for v in get_neighbours(u):
                 if v not in checked and s(u, v) > maxv:
                     maxv = s(u, v)
                     p = v
                     q = u
-        checked.append(p)
-        # Add node p with is connected to q to the tree bind with density maxv
-        try:
+        if p is not None and q is not None:
+            checked.append(p)
+            # Add node p with is connected to q to the tree bind with density maxv
             T.add(p, q, maxv)
-        except Exception as e:
-            print(e)
-            print(len(checked))
-            print(len(T))
-            print(maxv)
-            raise
+        else:
+            break
     return T
 
 
-def correct_graph_data(_path, multi=False):
+def correct_gml_graph_data(_path, multi=False):
     """ Sometimes the networkx reader has problems with the formatting of gml files so correct if error occure """
     tmp = "tmp.gml"
     # Open graph file and temporary file where the corrected graph is in
     with open(_path) as f:
-        with open("tmp.gml", "w") as out:
+        with open(tmp, "w") as out:
             is_open = False
             in_graph = False
             for line in f:
@@ -214,6 +209,25 @@ def correct_graph_data(_path, multi=False):
                     out.write(line)
                     is_open = False
 
+    return tmp
+
+
+def prepare_pajek_graph_data(_path):
+    tmp = "tmp.paj"
+    copy = False
+    edges = False
+    with open(_path) as f:
+        with open(tmp, "w") as out:
+            for line in f:
+                if line.startswith("*Vertices"):
+                    copy = True
+                if copy:
+                    out.write(line)
+                if line.startswith("*Edges"):
+                    if not edges:
+                        edges = True
+                    else:
+                        break
     return tmp
 
 
@@ -290,10 +304,23 @@ def read_labels(path):
 
 
 def generate_labels(cluster):
-    print(sum([len(c) for c in cluster]))
-    labels = [0 for _ in range(sum([len(c) for c in cluster]))]
-    print(len(labels))
+    nodes = list(G.nodes())
+    labels = [None for _ in nodes]
+    for num, c in enumerate(cluster):
+        for ele in c:
+            ix = nodes.index(ele)
+            labels[ix] = num +1
     return labels
+
+
+def make_labels_same_length(correct, labels):
+    for i in range(labels.count(None)):
+        ix = labels.index(None)
+        correct.pop(ix)
+        labels.pop(ix)
+
+    if len(labels) != len(correct):
+        print("Error!!!")
 
 
 def purity_score(true_labels, labels):
@@ -322,7 +349,7 @@ def karate():
         G = nx.read_gml(path, "id")
     except nx.NetworkXError:
         print("Correction format of data")
-        G = nx.read_gml(correct_graph_data(path), "id")
+        G = nx.read_gml(correct_gml_graph_data(path), "id")
 
     # Test if DCT's are equal
     print("Equality test result: ", equality_test())
@@ -330,6 +357,9 @@ def karate():
     For my implementation the density-connected tree is not equal every time I generate it.
     Between 1 and 3 edges/links are different so the Theorem 1 does not apply her 
     """
+
+    t = dct()
+    trees, clusters, cutted = cut_until(5, t)
 
 
 def football():
@@ -341,11 +371,12 @@ def football():
         G = nx.read_gml(path, "id")
     except nx.NetworkXError:
         print("Correction format of data")
-        G = nx.read_gml(correct_graph_data(path, multi=True), "id")
+        G = nx.read_gml(correct_gml_graph_data(path, multi=True), "id")
 
     # Calculate trees
     t = dct()
     trees, cluster, cutted = cut_until(12, t)
+    save_data(cluster)
     size = 4
     for i, t in enumerate(trees):
         plt.subplot(size, len(trees) // size, i + 1)
@@ -356,22 +387,42 @@ def football():
     plt.show()
 
 
-def yeast():
+def yeast(use_cached_data=True):
     global G
     print("==> yeast data set <==")
     path = r"data\Yeast.paj"
     label_path = r"data\Yeast.clu"
-    G = nx.read_pajek(path)
+    G = nx.read_pajek(prepare_pajek_graph_data(path))
 
-    _, cluster, _ = cut_until(12, dct())
+    print("Create dct")
+    # The yeast data has knots which are unconnected to the rest of the graph
+    # To prevent the DCT to consist only of one of these outliers, repeat until
+    # a minimum size is reached which guarantees that the main bundle is hit
+    if load_data() is None or not use_cached_data:
+        t = []
+        while len(t) < 1000:
+            print("try build")
+            t = dct()
+        print("Tree with {} nodes created".format(len(t)))
+        print("Cut tree and create clusters")
+        _, cluster, _ = cut_until(12, t)
+        save_data(cluster)
+    else:
+        print("Load stored clusters")
+        cluster = load_data()
 
+    print("Read labels")
     correct_labels = read_labels(label_path)
     my_labels = generate_labels(cluster)
 
+    make_labels_same_length(correct_labels, my_labels)
+
+    print("Calculate Scores")
     pur = purity_score(correct_labels, my_labels)
     mutal = met.adjusted_mutual_info_score(correct_labels, my_labels)
     rand = met.adjusted_rand_score(correct_labels, my_labels)
 
+    print()
     print("Purity:", pur)
     print("Mutal info:", mutal)
     print("Rand:", rand)
@@ -379,15 +430,14 @@ def yeast():
 
 def main():
     """ Do every task """
-
     # ------- karate data set --------
-    # karate()
+    karate()
 
     # ------- Football data set -------
-    # football()
+    football()
 
     # ------- Yeast data set -------
-    yeast()
+    yeast(use_cached_data=True)
 
 
 if __name__ == "__main__":
