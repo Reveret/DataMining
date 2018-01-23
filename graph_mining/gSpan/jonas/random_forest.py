@@ -10,6 +10,7 @@ def run_random_forest(X_train, y_train, X_test, y_test):
     :param y_test: Testing ground-truth
     :return: Prediction score
     """
+    print("Starting train of classifier ...")
     rf = RandomForestClassifier(n_estimators=100)
     rf.fit(X=X_train, y=y_train)
     score = rf.score(X_test, y_test)
