@@ -1,0 +1,45 @@
+ java -jar netkit-srl-1.3.0/lib/NetKit-1.3.0.jar -showAUC -depth 3 imb/imdb_all/imdb_all.arff 
+depth 0 :
+AUC-NOTblockBuster-10: 0.8963342530547891
+AUC-blockBuster-10: 0.897319668900276
+AUC-NOTblockBuster-Final: 0.8608731163690619 (0.021526127978894714)
+AUC-blockBuster-Final: 0.8623427971604952 (0.022265985018982016)
+
+
+
+depth 1 :
+AUC-NOTblockBuster-10: 0.8692942079018029
+AUC-blockBuster-10: 0.8711162255466053
+AUC-NOTblockBuster-Final: 0.8596182681338 (0.04165591352059796)
+AUC-blockBuster-Final: 0.8618390754480292 (0.04172699952627066)
+
+
+
+depth 2 :
+AUC-NOTblockBuster-10: 0.8650416171224732
+AUC-blockBuster-10: 0.8657352358303607
+AUC-NOTblockBuster-Final: 0.8606785783919717 (0.023040259375447784)
+AUC-blockBuster-Final: 0.8640535197030417 (0.024276749654872115)
+
+
+
+depth 3 :
+AUC-NOTblockBuster-10: 0.8302361595044522
+AUC-blockBuster-10: 0.8317847464188928
+AUC-NOTblockBuster-Final: 0.8605105214517673 (0.03849164749351568)
+AUC-blockBuster-Final: 0.8616367703090797 (0.0377347157912909)
+
+
+java -jar netkit-srl-1.3.0/lib/NetKit-1.3.0.jar -showAUC -pruneSingletons imb/imdb_all/imdb_all.arff 
+AUC-NOTblockBuster-10: 0.898840885142255
+AUC-blockBuster-10: 0.898840885142255
+AUC-NOTblockBuster-Final: 0.8682194172637242 (0.02462764563168554)
+AUC-blockBuster-Final: 0.8687501128732817 (0.024079818936848088)
+
+
+java -jar netkit-srl-1.3.0/lib/NetKit-1.3.0.jar -showAUC -pruneZeroKnowledge imb/imdb_all/imdb_all.arff 
+AUC-NOTblockBuster-10: 0.8077948717948717
+AUC-blockBuster-10: 0.8068717948717948
+AUC-NOTblockBuster-Final: 0.8609058329836611 (0.042823532252684114)
+AUC-blockBuster-Final: 0.8612696063264809 (0.042716033294739796)
+
