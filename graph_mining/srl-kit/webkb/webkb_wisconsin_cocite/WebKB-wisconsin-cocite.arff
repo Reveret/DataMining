@@ -1,0 +1,8 @@
+@nodetype entity
+@attribute id KEY
+@attribute class CATEGORICAL
+@nodedata WebKB-wisconsin-cocite.csv
+
+@edgetype link entity entity
+@reversible
+@edgedata WebKB-wisconsin-cocite.rn
