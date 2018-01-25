@@ -1,5 +1,6 @@
 import mmh3
 import math
+import matplotlib.pyplot as plt
 
 
 # -*- coding: utf-8 -*-
@@ -35,21 +36,37 @@ class CMS(object):
 
 
 def stram_mining(file):
-    cms = CMS(0.4, 0.02)
+    delt = [0.02, 0.01, 0.002, 0.0001, 0.00001]
+    eps = [0.4, 0.04, 0.002]
 
-    f = open(file, 'r')
-    line = f.readline().strip().split(",")
-    n = 0
-    while line != "":
-        for i in range(3, len(line)):
-            for words in line[i].split(" "):
-                cms.add(words)
+    for k in delt:
+        for l in eps:
+            print("eps, delt", l, k)
+            cms = CMS(l, k)
+            find = ["Caffeine", "Acetaminophen", "Trimethadione", "Diltiazem"]
 
-        line = f.readline().strip().split(",")
-        print("Line", n)
-        n += 1
+            plot_table = [[] for i in range(len(find))]
+
+            n = 0
+            for line in open(file):
+                row = line.strip().split(",")
+                for i in range(3, len(row)):
+                    for word in row[i].split(" "):
+                        cms.add(word)
 
 
+                for i in range(len(find)):
+                    plot_table[i].append(cms.estimate(find[i]))
+                #print("Line", n)
+                cms.estimate("Caffeine")
+                n += 1
+
+            for i in range(len(find)):
+                plt.close()
+                plt.plot(plot_table[i])
+                plt.savefig("results/"+find[i]+"_eps="+str(l)+"delt="+str(k)+".jpg")
 
 
 stram_mining("tweets.csv")
+
+
