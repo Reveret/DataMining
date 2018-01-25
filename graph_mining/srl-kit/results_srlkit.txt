@@ -179,8 +179,14 @@ As one can see, the predictions improve on higher depths. Since the depth is a f
 
 PRUNESINGLETONS:
 
-When one deletes all singletons, which are not giving any information, the AUC also increases.
+When one deletes all singletons, which are not giving any information, the AUC also increases. (except for the imdb dataset)
 
 PRUNEZEROKNOWLEDGE:
 
 The AUC also increases, if not only singletons, but also all not connected nodes are deleted. The result is not as good as with pruneSingletons, because we also might cut off some informations.
+
+SUMMARY:
+
+If we get some extra informations (depth > 0) we increase the AUC value in most cases.
+If we cut off some nodes we decrease the AUC value in most cases.
+There are some exceptions as we might cut off or get bad informations.
