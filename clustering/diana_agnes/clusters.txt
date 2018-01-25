@@ -1,0 +1,14 @@
+wenn wir als metric manhattan benutzen, also addition aller distanzen zweier cluster, dann werden zuerst kleinere cluster zusammengefügt, da dort die distanz nach dieser berechnung kleiner ist.
+wenn wir als method single benutzen, bildet sich die typische chain effekt, wo die minimale distanz zwischen zwei clustern am kleinsten ist. dies wirkt sich dahingehend aus, dass sie nicht kompakt sind, aber close.
+wenn wir als method complete benutzen, bilden sich sehr kompakte cluster, welche nicht zwingend weit voneinander entfernt sind. somit ist die closnesss nicht gegeben
+ohne sondereinstellungen also mit average bildet sich ein mix zwischen single und complete, welches kompakte und close cluster bildet.
+
+
+
+der unterschied zwischen diana und agnes ist, dass ist diana bei dem erstellen zweier cluster zur berechnung der distanz unter umständen durch andere punkte beeinträchtigt wird. somit könnten punkte die bei agnes früh in einem gemeinsamen cluster landen, bei diana früh in unterschiedlichen landen.
+
+der parameter stand sorgt für eine standartisierung des inputs. 
+
+
+
+
