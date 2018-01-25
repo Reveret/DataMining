@@ -67,7 +67,7 @@ def nodes_with_k_degrees(graph, graph_in, k):
     return count_out, count_in
 
 
-def check_for_subgraphs(graph):
+def check_for_subgraphs(graph, graph_in):
     nodes = []  # besuchte knoten
     edges = []  # noch nicht benutzte und ausgewählte kanten
     size_subgraphs = []
@@ -82,8 +82,11 @@ def check_for_subgraphs(graph):
         n = [next_node]
         nodes.append(next_node)
 
-        for edge in graph[nodes[0]]:
+        for edge in graph[n[0]]:    # Füge alle ausgehenden kanten hinzu
             edges.append(edge[0])
+        for edge in graph_in[n[0]]:  # Füge alle eingehende kanten hinzu
+            edges.append(edge[0])
+
 
         while len(edges) > 0:
             e = edges.pop(0)
@@ -92,12 +95,16 @@ def check_for_subgraphs(graph):
                 n.append(e)
                 unused_nodes.remove(e)
 
-                for edge in graph[e]:
+                for edge in graph[e]:       # Füge alle ausgehende Kanten hinzu
+                    edges.append(edge[0])
+                for edge in graph_in[e]:       # Füge alle eingehende Kanten hinzu
                     edges.append(edge[0])
 
         size_subgraphs.append(len(n))
 
-    return len(size_subgraphs)== 1, size_subgraphs
+    size_subgraphs.sort(reverse=True)
+
+    return sum(size_subgraphs), len(size_subgraphs)== 1, size_subgraphs
 
 
 files = ["cora/cora_cite/cora_cite", "imb/imdb_all/imdb_all",
@@ -110,10 +117,11 @@ for f in files:
 
     read_graph(f, graph, graph_in)
 
+    print("size of graph", len(graph.keys()))
     print("Avarage degree", avarage_in_degree(graph))
     print("density", density(graph))
     degree = 0
     print("nodes with degree", degree, ", ausgangsgrad, eingangsgrad", nodes_with_k_degrees(graph, graph_in, degree))
-    print("Full connected graph, size of the subgraphs",check_for_subgraphs(graph))
+    print("Full connected graph, size of the subgraphs",check_for_subgraphs(graph, graph_in))
 
     print("\n\n")
