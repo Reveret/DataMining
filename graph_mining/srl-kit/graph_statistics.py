@@ -104,7 +104,7 @@ def check_for_subgraphs(graph, graph_in):
 
     size_subgraphs.sort(reverse=True)
 
-    return sum(size_subgraphs), len(size_subgraphs)== 1, size_subgraphs
+    return len(size_subgraphs)== 1, size_subgraphs
 
 
 files = ["cora/cora_cite/cora_cite", "imb/imdb_all/imdb_all",
