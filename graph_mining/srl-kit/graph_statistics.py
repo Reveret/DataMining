@@ -70,21 +70,34 @@ def nodes_with_k_degrees(graph, graph_in, k):
 def check_for_subgraphs(graph):
     nodes = []  # besuchte knoten
     edges = []  # noch nicht benutzte und ausgewählte kanten
+    size_subgraphs = []
 
-    nodes.append(next(iter(graph)))
+    unused_nodes = [x for x in graph.keys()]
 
-    for edge in graph[nodes[0]]:
-        edges.append(edge[0])
 
-    while len(edges) > 0:
-        e = edges.pop(0)
-        if e not in nodes:
-            nodes.append(e)
+    count = 0
+    while len(nodes) < len(graph.keys()):
 
-            for edge in graph[e]:
-                edges.append(edge[0])
+        next_node = unused_nodes.pop()
+        n = [next_node]
+        nodes.append(next_node)
 
-    return len(nodes) == len(graph.keys()), len(nodes), len(graph.keys())
+        for edge in graph[nodes[0]]:
+            edges.append(edge[0])
+
+        while len(edges) > 0:
+            e = edges.pop(0)
+            if e not in nodes:
+                nodes.append(e)
+                n.append(e)
+                unused_nodes.remove(e)
+
+                for edge in graph[e]:
+                    edges.append(edge[0])
+
+        size_subgraphs.append(len(n))
+
+    return len(size_subgraphs)== 1, size_subgraphs
 
 
 files = ["cora/cora_cite/cora_cite", "imb/imdb_all/imdb_all",
@@ -101,6 +114,6 @@ for f in files:
     print("density", density(graph))
     degree = 0
     print("nodes with degree", degree, ", ausgangsgrad, eingangsgrad", nodes_with_k_degrees(graph, graph_in, degree))
-    print(check_for_subgraphs(graph))
+    print("Full connected graph, size of the subgraphs",check_for_subgraphs(graph))
 
     print("\n\n")
