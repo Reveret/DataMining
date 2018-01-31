@@ -1,6 +1,7 @@
 import mmh3
 import math
 import matplotlib.pyplot as plt
+import time
 
 
 # -*- coding: utf-8 -*-
@@ -11,8 +12,8 @@ class CMS(object):
         w size of hash tables
         d number of hash functions
         """
-        self.w = math.ceil(math.e / eps)
-        self.d = math.ceil(math.log(1 / delt, math.e))
+        self.w = math.ceil(math.e / eps)    # HAshtabbelengröße
+        self.d = math.ceil(math.log(1 / delt, math.e))  # Anzahl der Hashfunktionen
         self.N = 0
 
         self.hash_table = [x for x in range(self.d)]
@@ -21,12 +22,14 @@ class CMS(object):
     def hash(self, input, i):
         return mmh3.hash128(input, self.hash_table[i]) % self.w
 
+    # Füge das Wort in die Tabellen ein
     def add(self, input):
         self.N += 1
         for i in range(self.d):
             hashValue = self.hash(input, i)
             self.tables[i][hashValue] += 1
 
+    # Prüfe wie oft das wort input in der Tabelle "gezählt" wurde, lese die Obergrenze
     def estimate(self, input):
         e = float("inf")
         for i in range(self.d):
@@ -36,14 +39,23 @@ class CMS(object):
 
 
 def stream_mining(file):
-    delt = [0.02, 0.01, 0.002, 0.0001, 0.00001]
-    eps = [0.4, 0.04, 0.002]
+    delt = [0.02, 0.0000001]
+    eps = [0.04, 0.042, 0.00001]
+    find = ["Caffeine", "Acetaminophen", "Trimethadione", "Diltiazem"]
 
+    # save the results to plot at the end
+    results = [[[] for j in range(len(eps))] for i in range(len(delt))]
+
+    runtimes = [[0 for j in range(len(eps))] for i in range(len(delt))]
+
+    z = 0
     for k in delt:
+        y = 0
         for l in eps:
+            t0 = time.time()
             print("eps, delt", l, k)
             cms = CMS(l, k)
-            find = ["Caffeine", "Acetaminophen", "Trimethadione", "Diltiazem"]
+
 
             plot_table = [[] for i in range(len(find))]
 
@@ -61,10 +73,41 @@ def stream_mining(file):
                 cms.estimate("Caffeine")
                 n += 1
 
-            for i in range(len(find)):
-                plt.close()
-                plt.plot(plot_table[i])
-                plt.savefig("results/"+find[i]+"_eps="+str(l)+"delt="+str(k)+".jpg")
+            t1 = time.time()
+
+            runtimes[z][y] = t1-t0
+            results[z][y] = plot_table
+
+            y += 1
+        z += 1
+
+
+    # Create plot
+    for a in range(len(find)):
+        plt.close()
+        for b in range(len(eps)):
+            for c in range(len(delt)):
+                plt.plot(results[c][b][a], label="eps="+str(eps[b])+" delt="+str(delt[c]))
+
+        plt.legend()
+        plt.title(str(find[a]))
+        plt.xlabel("Number of tweets")
+        plt.ylabel("Number of found "+find[a])
+        plt.savefig("results2/" + find[a] + ".jpg")
+
+
+    print("", end="\t")
+    for c in range(len(delt)):
+        print(delt[c], end="\t")
+    print()
+    for b in range(len(eps)):
+        print(eps[b], end="\t")
+        for c in range(len(delt)):
+            print(runtimes[c][b], end="\t")
+        print()
+
+
+    plt.savefig("results2/"+find[i]+".jpg")     # +"_eps="+str(l)+"delt="+str(k)+
 
 
 stream_mining("tweets.csv")
