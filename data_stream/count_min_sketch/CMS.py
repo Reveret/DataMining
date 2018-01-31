@@ -35,7 +35,7 @@ class CMS(object):
         return e
 
 
-def stram_mining(file):
+def stream_mining(file):
     delt = [0.02, 0.01, 0.002, 0.0001, 0.00001]
     eps = [0.4, 0.04, 0.002]
 
@@ -67,6 +67,6 @@ def stram_mining(file):
                 plt.savefig("results/"+find[i]+"_eps="+str(l)+"delt="+str(k)+".jpg")
 
 
-stram_mining("tweets.csv")
+stream_mining("tweets.csv")
 
 
