@@ -1,0 +1,191 @@
+<?xml version='1.0'?>
+<!--
+build.xml
+Copyright (C) 2008 Sofus A. Macskassy
+
+Part of the open-source Network Learning Toolkit
+http://netkit-srl.sourceforge.net
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+$Id$
+-->
+<project name="NetworkLearning" default="all" basedir=".">
+    <!-- set global properties for this build -->
+
+    <property name="version" value="1.3.0"/>
+
+    <property name="src" value="src"/>
+    <property name="lib" value="lib"/>
+    <property name="classes" value="classes"/>
+    <property name="classpath" value="${classes}"/>
+    <property name="test" value="test"/>
+    <property name="test.src" value="src/test"/>
+    <property name="test.build" value="test/classes"/>
+    <property name="jarname" value="NetKit-${version}.jar"/>
+    <property name="runclass" value="netkit.Netkit"/>
+    <property name="docs" value="docs"/>
+
+    <target name="init">
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${classes}"/>
+
+        <!-- Create the directory for the jar file -->
+        <mkdir dir="${lib}"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <!-- run javac to compile the source files -->
+        <javac srcdir="${src}"
+	    source="1.5"
+	    target="1.5"
+            destdir="${classes}"
+            excludes="test/**">
+            <classpath>
+                <!-- use the value of the ${classpath} property in the classpath -->
+                <pathelement path="${classpath}"/>
+
+                <!-- include all jar files  -->
+                <fileset dir="${lib}">
+                    <include name="**/*.jar"/>
+                    <exclude name="${jarname}"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <!-- make a jar file -->
+        <jar jarfile="${lib}/${jarname}" basedir="${classes}/">
+            <!-- <include name=""> -->
+            <manifest>
+                <attribute name="Main-Class" value="${runclass}"/>
+                <attribute name="Built-By" value="Sofus A. Macskassy"/>
+                <attribute name="Implementation-Title" value="Network Learning Toolkit"/>
+                <attribute name="Implementation-Version" value="${version}"/>
+                <attribute name="Class-Path" value="fetch-datastructures.jar weka.jar colt.jar ."/>
+                <attribute name="Implementation-URL" value="http://netkit-srl.sourceforge.net/"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="docs">
+        <!-- Create the directory for the java docs -->
+        <mkdir dir="${docs}"/>
+
+        <!-- create javadocs -->
+        <javadoc packagenames="netkit.*"
+            sourcepath="${src}"
+            defaultexcludes="yes"
+            destdir="${docs}"
+            author="true"
+            version="true"
+            use="true"
+            windowtitle="Network Learning Toolkit API Documentation Version: ${version}">
+            <classpath>
+                <pathelement location="${lib}/weka.jar"/>
+                <pathelement location="${lib}/colt.jar"/>
+                <pathelement location="${lib}/fetch-datastructures.jar"/>
+            </classpath>
+	    <link href="http://download-llnw.oracle.com/javase/6/docs/api/"/>
+	    <link href="http://dsd.lbl.gov/~hoschek/colt/api/"/>
+            <link href="http://weka.sourceforge.net/doc/"/>
+        </javadoc>
+    </target>
+
+    <target name="run-example" depends="jar">
+        <!-- run the class -->
+        <java fork="yes" jar="${lib}/${jarname}">
+            <arg value="learning"/>
+            <arg value="-runs"/>
+            <arg value="10"/>
+            <!--            <arg value="-rclassifier"/>
+            <arg value="wvrn"/>
+            <arg value="-showauc"/>
+            <arg value="-showitacc"/>
+            <arg value="-vprior"/>
+            <arg value="examples/classprior"/>
+            <arg value="-numit"/>
+            <arg value="99"/>
+            <arg value="-format"/>
+            <arg value='"(insert GOOD with score %Good into table blah)"'/>
+            <arg value="-known"/>
+            <arg value="examples/goodbad-known.csv"/> -->
+            <arg value="examples/goodbad-schema.arff"/>
+
+            <!-- add a command line arg: <arg value="-h"/> -->
+            <classpath>
+                <!-- use the value of the ${classpath} property in the classpath -->
+                <pathelement path="${classpath}"/>
+
+                <!-- include all jar files  -->
+                <fileset dir="${lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="all" depends="jar,docs"/>
+
+    <target name="build-unit-test" depends="jar">
+        <mkdir dir="${test}"/>
+        <mkdir dir="${test.build}"/>
+
+        <!-- run javac to compile the source files -->
+        <javac srcdir="${test.src}"
+            destdir="${test.build}">
+            <classpath>
+                <!-- use the value of the ${classpath} property in the classpath -->
+                <pathelement path="${classpath}"/>
+
+                <!-- include all jar files  -->
+                <fileset dir="${lib}">
+                    <include name="**/*.jar"/>
+                    <exclude name="${jarname}"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="run-unit-test" depends="jar,build-unit-test">
+        <mkdir dir="${test}"/>
+
+        <junit printsummary="yes" haltonfailure="yes">
+          <classpath>
+              <pathelement location="${test.build}"/>
+
+              <!-- include all jar files  -->
+              <fileset dir="${lib}">
+                  <include name="**/*.jar"/>
+              </fileset>
+          </classpath>
+
+          <!-- <formatter type="plain"/> -->
+
+          <batchtest fork="yes" todir="${test}">
+            <fileset dir="${test.src}">
+              <include name="**/*Test*.java"/>
+            </fileset>
+          </batchtest>
+        </junit>
+    </target>
+
+    <target name="clean">
+        <!-- Delete the ${build} and ${lib} directory trees -->
+        <delete file="${lib}/${jarname}"/>
+        <delete dir="${classes}"/>
+        <delete dir="${docs}"/>
+        <delete dir="${test}"/>
+    </target>
+</project>

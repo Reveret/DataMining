@@ -1,0 +1,192 @@
+java -jar netkit-srl-1.3.0/lib/NetKit-1.3.0.jar -showAUC -depth 0 cora/cora_cite/cora_cite.arff 
+
+depth 0 :
+
+AUC-RuleLearning-Final: 0.9418268623745542 (0.024094007065496068)
+AUC-ReinforcementLearning-Final: 0.9660210309325586 (0.018615711880033907)
+AUC-Theory-Final: 0.9325910215238509 (0.02482076763873011)
+AUC-NeuralNetworks-Final: 0.9182436194367318 (0.017079103473532357)
+AUC-ProbabilisticMethods-Final: 0.9396730047464839 (0.025072322921601043)
+AUC-GeneticAlgorithms-Final: 0.9807741362305503 (0.009185521795992002)
+AUC-CaseBased-Final: 0.954440128324552 (0.012281718686192116)
+
+
+depth 1 :
+
+AUC-RuleLearning-Final: 0.942984569106747 (0.037476406157115644)
+AUC-ReinforcementLearning-Final: 0.9618798143966181 (0.022032712966543258)
+AUC-Theory-Final: 0.9320227267722722 (0.027558715874789145)
+AUC-NeuralNetworks-Final: 0.9189209006487818 (0.019232321792572234)
+AUC-ProbabilisticMethods-Final: 0.9406325953799206 (0.02036690771380409)
+AUC-GeneticAlgorithms-Final: 0.9824925006986757 (0.008712872871256777)
+AUC-CaseBased-Final: 0.953340975252066 (0.013678295550439536)
+
+
+depth 2 :
+
+AUC-RuleLearning-Final: 0.9439695050756869 (0.021869505070928608)
+AUC-ReinforcementLearning-Final: 0.9601766688571471 (0.035441167785628724)
+AUC-Theory-Final: 0.9280891109395333 (0.014886923701512072)
+AUC-NeuralNetworks-Final: 0.9168316671409839 (0.018827719417902185)
+AUC-ProbabilisticMethods-Final: 0.9415195267622295 (0.01712934875792992)
+AUC-GeneticAlgorithms-Final: 0.980662513215383 (0.01012643743497636)
+AUC-CaseBased-Final: 0.9499153915516793 (0.017849374346026056)
+
+
+depth 3 :
+
+AUC-RuleLearning-Final: 0.946939833674602 (0.027744588153920526)
+AUC-ReinforcementLearning-Final: 0.9635305922792557 (0.028623033618988627)
+AUC-Theory-Final: 0.9302869610360608 (0.01565783329116027)
+AUC-NeuralNetworks-Final: 0.9171889473752136 (0.015084144978779638)
+AUC-ProbabilisticMethods-Final: 0.942048584827193 (0.016531515090740447)
+AUC-GeneticAlgorithms-Final: 0.9802755037360205 (0.008895670639176727)
+AUC-CaseBased-Final: 0.9534938857592488 (0.02118981273113378)
+
+
+java -jar netkit-srl-1.3.0/lib/NetKit-1.3.0.jar -showAUC -pruneSingletons cora/cora_cite/cora_cite.arff 
+
+AUC-RuleLearning-Final: 0.9628933526686667 (0.029745298922229053)
+AUC-ReinforcementLearning-Final: 0.9732628520616299 (0.01649337793350549)
+AUC-Theory-Final: 0.9451723446807639 (0.024595949252179724)
+AUC-NeuralNetworks-Final: 0.9454521518397044 (0.009861878077953261)
+AUC-ProbabilisticMethods-Final: 0.962332881839769 (0.010511534674394508)
+AUC-GeneticAlgorithms-Final: 0.9904187868031927 (0.008320800684825564)
+AUC-CaseBased-Final: 0.9703026344367778 (0.017254269987393506)
+
+
+java -jar netkit-srl-1.3.0/lib/NetKit-1.3.0.jar -showAUC -pruneZeroKnowledge cora/cora_cite/cora_cite.arff 
+
+AUC-RuleLearning-Final: 0.9604758582678106 (0.026371828038093587)
+AUC-ReinforcementLearning-Final: 0.972266975232529 (0.015650830057792005)
+AUC-Theory-Final: 0.9467499316815557 (0.023256145930823587)
+AUC-NeuralNetworks-Final: 0.9418520046962472 (0.015188078970423617)
+AUC-ProbabilisticMethods-Final: 0.9588331786061541 (0.02068300076338245)
+AUC-GeneticAlgorithms-Final: 0.9893075180859089 (0.007658356989448766)
+AUC-CaseBased-Final: 0.9709012831408085 (0.008975031362725813)
+
+
+ java -jar netkit-srl-1.3.0/lib/NetKit-1.3.0.jar -showAUC -depth 3 imb/imdb_all/imdb_all.arff 
+depth 0 :
+
+AUC-NOTblockBuster-Final: 0.8608731163690619 (0.021526127978894714)
+AUC-blockBuster-Final: 0.8623427971604952 (0.022265985018982016)
+
+
+
+depth 1 :
+
+AUC-NOTblockBuster-Final: 0.8596182681338 (0.04165591352059796)
+AUC-blockBuster-Final: 0.8618390754480292 (0.04172699952627066)
+
+
+
+depth 2 :
+
+AUC-NOTblockBuster-Final: 0.8606785783919717 (0.023040259375447784)
+AUC-blockBuster-Final: 0.8640535197030417 (0.024276749654872115)
+
+
+
+depth 3 :
+
+AUC-NOTblockBuster-Final: 0.8605105214517673 (0.03849164749351568)
+AUC-blockBuster-Final: 0.8616367703090797 (0.0377347157912909)
+
+
+java -jar netkit-srl-1.3.0/lib/NetKit-1.3.0.jar -showAUC -pruneSingletons imb/imdb_all/imdb_all.arff 
+
+AUC-NOTblockBuster-Final: 0.8682194172637242 (0.02462764563168554)
+AUC-blockBuster-Final: 0.8687501128732817 (0.024079818936848088)
+
+
+java -jar netkit-srl-1.3.0/lib/NetKit-1.3.0.jar -showAUC -pruneZeroKnowledge imb/imdb_all/imdb_all.arff 
+
+AUC-NOTblockBuster-Final: 0.8609058329836611 (0.042823532252684114)
+AUC-blockBuster-Final: 0.8612696063264809 (0.042716033294739796)
+
+java -jar netkit-srl-1.3.0/lib/NetKit-1.3.0.jar -showAUC -depth 0 webkb/webkb_texas_cocite/WebKB-texas-cocite.arff 
+
+
+depth 0:
+
+AUC-faculty-Final: 0.9518692550806012 (0.05496081889264286)
+AUC-course-Final: 0.9109204963299791 (0.06207311988779296)
+AUC-department-Final: 0.9165144251990748 (0.07174656825137692)
+AUC-student-Final: 0.9691956786485333 (0.025727711797827624)
+AUC-project-Final: 0.8016663963045361 (0.2910910448107223)
+AUC-staff-Final: 0.3317204301075269 (0.44937468061354036)
+
+
+depth 1:
+
+AUC-faculty-Final: 0.956638195879019 (0.04084369020248422)
+AUC-course-Final: 0.9082560870102585 (0.07237969340661755)
+AUC-department-Final: 0.9341446981133439 (0.06291150003105189)
+AUC-student-Final: 0.964297577131988 (0.024985519243851888)
+AUC-project-Final: 0.9042458441478185 (0.07411810843803188)
+AUC-staff-Final: 0.16985887096774194 (0.22498252078307868)
+
+
+
+depth 2:
+
+AUC-faculty-Final: 0.940854944647492 (0.07584183954204111)
+AUC-course-Final: 0.9169515782697095 (0.062280446109481885)
+AUC-department-Final: 0.9354218913270639 (0.06973120608728615)
+AUC-student-Final: 0.9627927591414434 (0.041336768695609594)
+AUC-project-Final: 0.9058171884616776 (0.08792487581892437)
+AUC-staff-Final: 0.3606060606060606 (0.4002696519931325)
+
+
+
+depth 3:
+
+AUC-faculty-Final: 0.9546175880313811 (0.0481176603250562)
+AUC-course-Final: 0.8921363378927338 (0.10655717174927552)
+AUC-department-Final: 0.8480705879352524 (0.30084653840315856)
+AUC-student-Final: 0.9554247625262695 (0.050802304372993545)
+AUC-project-Final: 0.8029755103072678 (0.29068116350014983)
+AUC-staff-Final: 0.2774193548387097 (0.3843841634460308)
+
+
+
+
+
+java -jar netkit-srl-1.3.0/lib/NetKit-1.3.0.jar -showAUC -pruneSingletons webkb/webkb_texas_cocite/WebKB-texas-cocite.arff 
+
+AUC-faculty-Final: 0.8620090311986864 (0.3052871035329285)
+AUC-course-Final: 0.9011011027605857 (0.09050494095995393)
+AUC-department-Final: 0.902530609306958 (0.14039650522126224)
+AUC-student-Final: 0.9584476690071317 (0.04665589768243711)
+AUC-project-Final: 0.8992749935995905 (0.08135425694472892)
+AUC-staff-Final: 0.19143145161290323 (0.3563901968946725)
+
+
+java -jar netkit-srl-1.3.0/lib/NetKit-1.3.0.jar -showAUC -pruneZeroKnowledge webkb/webkb_texas_cocite/WebKB-texas-cocite.arff 
+
+AUC-faculty-Final: 0.9425011929322273 (0.06742727234710984)
+AUC-course-Final: 0.8616310410020087 (0.17371177324447573)
+AUC-department-Final: 0.9407473631360126 (0.0769717353459946)
+AUC-student-Final: 0.9647098103135254 (0.04922147992789574)
+AUC-project-Final: 0.8853640438630708 (0.15661481503601984)
+AUC-staff-Final: 0.196875 (0.2916852672640305)
+
+
+DEPTH:
+
+As one can see, the predictions improve on higher depths. Since the depth is a factor for the given information, this seems legit.
+
+PRUNESINGLETONS:
+
+When one deletes all singletons, which are not giving any information, the AUC also increases. (except for the imdb dataset)
+
+PRUNEZEROKNOWLEDGE:
+
+The AUC also increases, if not only singletons, but also all not connected nodes are deleted. The result is not as good as with pruneSingletons, because we also might cut off some informations.
+
+SUMMARY:
+
+If we get some extra informations (depth > 0) we increase the AUC value in most cases.
+If we cut off some nodes we decrease the AUC value in most cases.
+There are some exceptions as we might cut off or get bad informations.
