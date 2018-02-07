@@ -1,0 +1,8 @@
+@nodetype entity
+@attribute id KEY
+@attribute class CATEGORICAL
+@nodedata WebKB-texas-link1.csv
+
+@edgetype link entity entity
+@reversible
+@edgedata WebKB-texas-link1.rn

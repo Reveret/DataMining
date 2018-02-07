@@ -18,19 +18,19 @@ class CMS(object):
         self.hash_table = [x for x in range(self.d)]
         self.tables = [[0 for j in range(self.w)] for i in range(self.d)]
 
-    def hash(self, input, i):
-        return mmh3.hash128(input, self.hash_table[i]) % self.w
+    def hash(self, inp, i):
+        return mmh3.hash128(inp, self.hash_table[i]) % self.w
 
-    def add(self, input):
+    def add(self, inp):
         self.N += 1
         for i in range(self.d):
-            hashValue = self.hash(input, i)
+            hashValue = self.hash(inp, i)
             self.tables[i][hashValue] += 1
 
-    def estimate(self, input):
+    def estimate(self, inp):
         e = float("inf")
         for i in range(self.d):
-            hashValue = self.hash(input, i)
+            hashValue = self.hash(inp, i)
             e = min(e, self.tables[i][hashValue])
         return e
 
