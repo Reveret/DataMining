@@ -1,0 +1,61 @@
+How the epsilon and delta parameters affect the outpupt:
+
+Epsilon --> how much error is added to our counts with each item we add to the cm sketch
+
+Delta --> with what probability do we want to allow the count estimate to be outside of our epsilon error rate
+
+With smaller epsilons we get bigger size of the hash tables, so the probabilities of having collisions are also lower. However, this implies using more memory space.
+
+To understand better the use of Delta we need to have a look at the accuracy, since accuracy is not always granted when calculating the estimation count of an element:
+    1. True Count <= Estimated Count
+    2. Estimated Count <= True Count + ε * Number Of Items Added
+    3. There is a δ chance that #2 is not true
+So the more hash functions we have, it is more probable that at least one of them did not have a lot of collisions with other elements.
+
+# Plots
+We used the following deltas und epsiolns:
+
+delt = [0.02, 0.01, 0.002, 0.0001, 0.00001]
+eps = [0.4, 0.04, 0.002]
+
+The following drugs where chosen:
+CAFFEINE - 52966
+TRIMETHADIONE - 1
+ACETAMINOPHEN - 31647
+DILTIAZEM - 41
+
+$Epsilon 0.4
+When using the epsilon with the biggest value 0.4, we end up having estimations of between 350,000 and 400,000 independently of the drug frequency. Also the delta values do not have much impact.
+
+We can conclude that too big epsilons (small hash tables) produce too many collisions. Moreover, the number of hash functions do not have much impact, since all of them will have collisions equally.
+
+$Epsilon 0.04
+With a lower epsilon we can start to see how the delta (number of hash functions) can have an impact. 
+
+Acetaminophen has around 25k for every delta value except for the biggest one, a little bit more of 25k for 0.02.
+Caffeine has 40k for all the deltas except for the two smallest ones (0.0001 and 0.00001), which have 30k.
+Diltiazem has 30k for every delta except the biggest one (0.02), which has 40k.
+Trimethadione has around 40k for the biggest ones (0.02 and 0.01) but 35k for the rest of them.
+
+It is easily seen how having more hash functions improves the estimated values. Moreover, we can also observe that the less frequent drugs start to get lower estimations with less hash functions.
+
+$Epsilon 0.002
+Once we have an epsilon good enough, we just need to adjust wich delta is more efficent for the results given.
+
+For the unfrequent drugs Diltiazem and Trimethadione we get the best results possible pretty soon. The Diltiazem plots stay the same from delta 0.01 while the Trimethadione ones stay the same right from delt 0.02. 
+For the frequent drugs Acetaminophen and Caffeine we get better results down at delta=0.0001/0.00001.
+
+We can conclude that when the hash size is big enough where most of the hash functions will not get much collisions, we do not really need much hash functions to distribute the possibilities of collisions.
+Taking this into account and what we commented for the first epsilons, we can confirm experimentally how the best practise would be to have a balance between hash size (memory usage) and hash functions (computational usage).
+
+
+# Some comments
+As we can see in the plots, when the estimation values are big the lines are pretty much straigforward. While when they are small the lines are shaky and a little bit more deformed. With bigger values, small changes between them have less visual impact than with small values, where small changes can easier be seen.
+Another curiosity in the dataset is that, with the Caffeine drug, we can see a jump from 20k to 25k (at 10k to 15k for delta=0.0001/0.00001). That can mean, that in some point of the dataset it has a hot appearence (a lot of times in a small window) or something similar to it that collides.
+
+
+
+
+
+
+

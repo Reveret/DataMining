@@ -1,3 +1,5 @@
+﻿#####################################
+####Latex Zeug####
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
@@ -6,10 +8,6 @@
 *.fls
 *.out
 *.toc
-*.fmt
-*.fot
-*.cb
-*.cb2
 
 ## Intermediate documents:
 *.dvi
@@ -36,6 +34,8 @@
 *.pdfsync
 
 ## Auxiliary and intermediate files from other packages:
+
+
 # algorithms
 *.alg
 *.loa
@@ -51,15 +51,8 @@ acs-*.bib
 *.snm
 *.vrb
 
-# cprotect
-*.cpt
-
-# fixme
-*.lox
-
-#(r)(e)ledmac/(r)(e)ledpar
+#(e)ledmac/(e)ledpar
 *.end
-*.?end
 *.[1-9]
 *.[1-9][0-9]
 *.[1-9][0-9][0-9]
@@ -79,7 +72,6 @@ acs-*.bib
 *.glg
 *.glo
 *.gls
-*.glsdefs
 
 # gnuplottex
 *-gnuplottex-*
@@ -89,7 +81,6 @@ acs-*.bib
 
 # knitr
 *-concordance.tex
-# TODO Comment the next line if you want to keep your tikz graphics files
 *.tikz
 *-tikzDictionary
 
@@ -104,8 +95,6 @@ acs-*.bib
 
 # minitoc
 *.maf
-*.mlf
-*.mlt
 *.mtc
 *.mtc[0-9]
 *.mtc[1-9][0-9]
@@ -133,16 +122,12 @@ _minted*
 *.sympy
 sympy-plots-for-*.tex/
 
-# pdfcomment
-*.upa
-*.upb
-
-# pythontex
+#pythontex
 *.pytxcode
 pythontex-files-*/
 
-# thmtools
-*.loe
+# Texpad
+.texpadtmp
 
 # TikZ & PGF
 *.dpth
@@ -155,73 +140,53 @@ pythontex-files-*/
 # xindy
 *.xdy
 
-# xypic precompiled matrices
-*.xyc
-
-# endfloat
-*.ttt
-*.fff
-
-# Latexian
-TSWLatexianTemp*
-
-## Editors:
 # WinEdt
 *.bak
 *.sav
 
-# Texpad
-.texpadtmp
+#####################
+#Dia Zeug
+*.dia~
+*.autosave
 
-# Kile
-*.backup
+###############################
+#Mac Zeug
+.DS_Store
+#Windows Zeug
+*.ini
+Thumbs.db
+_Bücher
 
-# KBibTeX
-*~[0-9]*
+###############################
+##Java Zeug
+*.class
 
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
 
+# Package Files #
+*.jar
+*.war
+*.ear
 
-### JetBrains ###
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
-# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
 
-# User-specific stuff:
-.idea/workspace.xml
-.idea/tasks.xml
+###########################
+#IntelliJ Zeug
+.idea
+*.iml
+out/
+lwjgl/
+lwjgl
+*/lwjgl
+*/lwjgl/
+*/lwjgl/*
+lwjgl*
+_*
 
-# Sensitive or high-churn files:
-.idea/dataSources/
-.idea/dataSources.ids
-.idea/dataSources.xml
-.idea/dataSources.local.xml
-.idea/sqlDataSources.xml
-.idea/dynamic.xml
-.idea/uiDesigner.xml
-
-# Gradle:
-.idea/gradle.xml
-.idea/libraries
-
-# Mongo Explorer plugin:
-.idea/mongoSettings.xml
-
-## File-based project format:
-*.iws
-
-## Plugin-specific files:
-
-# IntelliJ
-/out/
-
-# mpeltonen/sbt-idea plugin
-.idea_modules/
-
-# JIRA plugin
-atlassian-ide-plugin.xml
-
-# Crashlytics plugin (for Android Studio and IntelliJ)
-com_crashlytics_export_strings.xml
-crashlytics.properties
-crashlytics-build.properties
-fabric.properties
+###########################
+#Pycharm
+__pycache__
+modules/
 
