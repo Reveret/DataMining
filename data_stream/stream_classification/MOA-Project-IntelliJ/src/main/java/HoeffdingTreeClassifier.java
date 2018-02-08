@@ -24,7 +24,7 @@ public class HoeffdingTreeClassifier {
                 //prepare classification performance evaluator
                 WindowClassificationPerformanceEvaluator windowClassEvaluator =
                         new WindowClassificationPerformanceEvaluator();
-                windowClassEvaluator.widthOption.setValue(100);
+                windowClassEvaluator.widthOption.setValue(1000);
                 windowClassEvaluator.prepareForUse();
 
                 //do the learning and checking using evaluate-prequential technique

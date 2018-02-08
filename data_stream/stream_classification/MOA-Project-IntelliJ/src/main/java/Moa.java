@@ -15,6 +15,6 @@ public class Moa {
         naive.run(1000000);
 
         AODEClassifier aode = new AODEClassifier(file);
-        aode.run(10000000);
+        aode.run(1000000);
     }
 }

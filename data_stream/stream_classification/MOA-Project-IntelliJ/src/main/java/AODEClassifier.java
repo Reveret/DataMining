@@ -22,7 +22,7 @@ public class AODEClassifier {
         this.file = file;
     }
 
-    public void run(int numInstances) throws Exception{
+    public void run(int numInstances) {
         Classifier learner = new AODE();
 
         ArffFileStream stream = new ArffFileStream(file,-1);
