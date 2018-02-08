@@ -2,4 +2,7 @@
 - The error of the model is computed form the sequence of examples
 - For each example in the strea, the actual model makes a prediction based only on the example attribute-values
 
+
+
+
 - The ElecNormew just has one element i think
