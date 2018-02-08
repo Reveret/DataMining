@@ -1,9 +1,10 @@
 
 import moa.classifiers.Classifier;
 import moa.classifiers.trees.HoeffdingTree;
-import moa.core.TimingUtils;
+import moa.evaluation.LearningCurve;
+import moa.evaluation.WindowClassificationPerformanceEvaluator;
 import moa.streams.ArffFileStream;
-import com.yahoo.labs.samoa.instances.Instance;
+import moa.tasks.EvaluatePrequential;
 
 
 public class HoeffdingTreeClassifier {
@@ -14,31 +15,30 @@ public class HoeffdingTreeClassifier {
                 this.file = file;
         }
 
-        public void run(int numInstances, boolean isTesting){
+        public void run(int numInstances){
                 Classifier learner = new HoeffdingTree();
+
                 ArffFileStream stream = new ArffFileStream(file,-1);
                 stream.prepareForUse();
 
-                learner.setModelContext(stream.getHeader());
-                learner.prepareForUse();
+                //prepare classification performance evaluator
+                WindowClassificationPerformanceEvaluator windowClassEvaluator =
+                        new WindowClassificationPerformanceEvaluator();
+                windowClassEvaluator.widthOption.setValue(100);
+                windowClassEvaluator.prepareForUse();
 
-                int numberSamplesCorrect = 0;
-                int numberSamples = 0;
-                boolean preciseCPUTiming = TimingUtils.enablePreciseTiming();
-                long evaluateStartTime = TimingUtils.getNanoCPUTimeOfCurrentThread();
-                while (stream.hasMoreInstances() && numberSamples < numInstances) {
-                        Instance trainInst = stream.nextInstance().getData();
-                        if (isTesting) {
-                                if (learner.correctlyClassifies(trainInst)){
-                                        numberSamplesCorrect++;
-                                }
-                        }
-                        numberSamples++;
-                        learner.trainOnInstance(trainInst);
-                }
-                double accuracy = 100.0 * (double) numberSamplesCorrect/ (double) numberSamples;
-                double time = TimingUtils.nanoTimeToSeconds(TimingUtils.getNanoCPUTimeOfCurrentThread()- evaluateStartTime);
-                System.out.println(numberSamples + " instances processed with " + accuracy + "% accuracy in "+time+" seconds.");
+                //do the learning and checking using evaluate-prequential technique
+                EvaluatePrequential ep = new EvaluatePrequential();
+                ep.instanceLimitOption.setValue(numInstances);
+                ep.learnerOption.setCurrentObject(learner);
+                ep.streamOption.setCurrentObject(stream);
+                ep.evaluatorOption.setCurrentObject(windowClassEvaluator);
+                ep.prepareForUse();
+
+                //do the task and get the result
+                LearningCurve le = (LearningCurve) ep.doTask();
+                System.out.println("\nEvaluate prequential using Hoeffding Tree");
+                System.out.println(le);
         }
 
 }

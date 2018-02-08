@@ -1,19 +1,10 @@
 
-import com.yahoo.labs.samoa.instances.Instance;
-import com.yahoo.labs.samoa.instances.WekaToSamoaInstanceConverter;
-import moa.classifiers.Classifier;
-import moa.classifiers.trees.HoeffdingTree;
-import moa.core.TimingUtils;
+import weka.classifiers.Classifier;
+import moa.evaluation.LearningCurve;
+import moa.evaluation.WindowClassificationPerformanceEvaluator;
 import moa.streams.ArffFileStream;
-import weka.classifiers.Evaluation;
+import moa.tasks.EvaluatePrequential;
 import weka.classifiers.bayes.AODE;
-import weka.core.Instances;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import weka.classifiers.meta.MOA;
 
 public class AODEClassifier {
 
@@ -23,34 +14,30 @@ public class AODEClassifier {
         this.file = file;
     }
 
-    public void run(int numInstances, boolean isTesting) throws Exception{
-        WekaToSamoaInstanceConverter converter = new WekaToSamoaInstanceConverter();
-        AODE learner = new AODE();
+    public void run(int numInstances) {
+        Classifier learner = new AODE();
 
         ArffFileStream stream = new ArffFileStream(file,-1);
         stream.prepareForUse();
 
-        learner.setModelContext(converter.samoaInstance(stream.getHeader()));
-        learner.prepareForUse();
+        //prepare classification performance evaluator
+        WindowClassificationPerformanceEvaluator windowClassEvaluator =
+                new WindowClassificationPerformanceEvaluator();
+        windowClassEvaluator.widthOption.setValue(1000);
+        windowClassEvaluator.prepareForUse();
 
-        int numberSamplesCorrect = 0;
-        int numberSamples = 0;
-        boolean preciseCPUTiming = TimingUtils.enablePreciseTiming();
-        long evaluateStartTime = TimingUtils.getNanoCPUTimeOfCurrentThread();
-        while (stream.hasMoreInstances() && numberSamples < numInstances) {
-            Instance trainInst = stream.nextInstance().getData();
-            if (isTesting) {
-                if (learner.correctlyClassifies(trainInst)){
-                    numberSamplesCorrect++;
-                }
-            }
-            numberSamples++;
-            learner.trainOnInstance(trainInst);
-        }
-        double accuracy = 100.0 * (double) numberSamplesCorrect/ (double) numberSamples;
-        double time = TimingUtils.nanoTimeToSeconds(TimingUtils.getNanoCPUTimeOfCurrentThread()- evaluateStartTime);
-        System.out.println(numberSamples + " instances processed with " + accuracy + "% accuracy in "+time+" seconds.");
+        //do the learning and checking using evaluate-prequential technique
+        EvaluatePrequential ep = new EvaluatePrequential();
+        ep.instanceLimitOption.setValue(numInstances);
+        ep.learnerOption.setCurrentObject(learner);
+        ep.streamOption.setCurrentObject(stream);
+        ep.evaluatorOption.setCurrentObject(windowClassEvaluator);
+        ep.prepareForUse();
+
+        //do the task and get the result
+        LearningCurve le = (LearningCurve) ep.doTask();
+        System.out.println("\nEvaluate prequential using AODE");
+        System.out.println(le);
     }
-
 
 }
